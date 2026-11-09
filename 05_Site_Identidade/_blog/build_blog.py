@@ -4,8 +4,13 @@
 Uso: python3 _blog/build_blog.py  (rodar na raiz do site)
 - Cada artigo fica em _blog/posts/<slug>.html, com um bloco <!--meta ... --> no topo.
 - O script gera blog/index.html, blog/<slug>/index.html, blog/blog.css e sitemap.xml.
+- Agendamento: só entram no site os artigos com `date` igual ou anterior a hoje
+  (horário de Brasília). O Netlify roda este script a cada deploy, e uma função
+  agendada (netlify/functions/publicar-blog.mjs) dispara um deploy toda segunda às 9h.
+- Para testar uma data: BLOG_TODAY=2026-11-30 python3 _blog/build_blog.py
 """
-import html, re, shutil
+import html, os, re, shutil
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -87,9 +92,23 @@ def cta(up, msg):
 """
 
 
+def today_br():
+    if os.environ.get("BLOG_TODAY"):
+        return date.fromisoformat(os.environ["BLOG_TODAY"])
+    return (datetime.now(timezone.utc) - timedelta(hours=3)).date()
+
+
 def build():
-    posts = sorted((parse(p) for p in (SRC / "posts").glob("*.html")), key=lambda m: m["date"], reverse=True)
+    hoje = today_br()
+    todos = [parse(p) for p in (SRC / "posts").glob("*.html")]
+    posts = sorted((m for m in todos if date.fromisoformat(m["date"]) <= hoje), key=lambda m: m["date"], reverse=True)
+    agendados = sorted(m["date"] + " " + m["slug"] for m in todos if date.fromisoformat(m["date"]) > hoje)
     OUT.mkdir(exist_ok=True)
+    # remove páginas de artigos que ainda não devem estar no ar
+    publicados = {m["slug"] for m in posts}
+    for d in OUT.iterdir():
+        if d.is_dir() and d.name not in publicados:
+            shutil.rmtree(d)
     shutil.copy(SRC / "blog.css", OUT / "blog.css")
 
     for m in posts:
@@ -125,6 +144,7 @@ def build():
 </article>
 """
         page += cta("../../", msg) + foot()
+        page = page.replace("{{SYM}}", SYM)
         d = OUT / m["slug"]
         d.mkdir(exist_ok=True)
         (d / "index.html").write_text(page)
@@ -156,7 +176,9 @@ def build():
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sm += "".join(f"  <url><loc>{u}</loc></url>\n" for u in urls) + "</urlset>\n"
     (ROOT / "sitemap.xml").write_text(sm)
-    print(f"{len(posts)} artigo(s) gerado(s).")
+    print(f"Hoje (Brasília): {hoje}. {len(posts)} artigo(s) no ar.")
+    for a in agendados:
+        print("  agendado:", a)
 
 
 if __name__ == "__main__":
