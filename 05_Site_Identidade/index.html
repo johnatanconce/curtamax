@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curtamax arttech · Criatividade com propósito. Tecnologia com alma.</title>
+<meta name="description" content="Curtamax: ArtTech que une arte, design e tecnologia para criar experiências criativas com propósito.">
+<style>
+@font-face{font-family:"DIN Next";src:url(assets/fonts/DINNextW1G-Light.woff) format("woff");font-weight:300;font-display:swap}
+@font-face{font-family:"DIN Next";src:url(assets/fonts/DINNextW1G-Regular.woff) format("woff");font-weight:400;font-display:swap}
+@font-face{font-family:"DIN Next";src:url(assets/fonts/DINNextW1G-Bold.woff) format("woff");font-weight:700;font-display:swap}
+@font-face{font-family:"DIN Next";src:url(assets/fonts/DINNextW1G-Black.woff) format("woff");font-weight:900;font-display:swap}
+@font-face{font-family:"Museo";src:url(assets/fonts/Museo700-Regular.woff) format("woff");font-weight:700;font-display:swap}
+@font-face{font-family:"Museo";src:url(assets/fonts/Museo300-Regular.woff) format("woff");font-weight:300;font-display:swap}
+:root{
+  --teal:#00707c; --cyan:#00f3ff; --green:#11562d; --lime:#d1e22d;
+  --ink:#031417; --ink2:#06242a; --paper:#f2f7f7; --dark-text:#0b2e33;
+  --muted:rgba(255,255,255,.66); --line:rgba(0,243,255,.18);
+  --museo:"Museo","DIN Next",Georgia,serif; --din:"DIN Next","Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(20px,5vw,80px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--ink);color:#fff;font-family:var(--din);font-weight:400;line-height:1.6;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--cyan);color:var(--ink)}
+canvas{display:block}
+.sym path{fill:currentColor}
+
+/* title with rule, like the manual */
+.rt{position:relative;display:inline-block;font-family:var(--museo);font-weight:700;font-size:clamp(2.2rem,5.2vw,4.4rem);line-height:1.05;letter-spacing:-.01em;padding:0 0 .18em;margin-bottom:.55em}
+.rt::after{content:"";position:absolute;left:calc(-1 * var(--pad) - 2px);right:-.6em;bottom:0;height:2px;background:currentColor;transform-origin:left;transform:scaleX(0);transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.rt.in::after{transform:scaleX(1)}
+.light .rt{color:var(--teal)}
+.dark .rt{color:#fff}
+.dark .rt::after{background:var(--cyan)}
+.kick{font-family:var(--din);font-weight:700;font-size:.75rem;letter-spacing:.34em;text-transform:uppercase;color:var(--cyan);display:block;margin-bottom:14px}
+.light .kick{color:var(--teal)}
+.sec{position:relative;padding:clamp(90px,14vh,160px) var(--pad);z-index:2}
+.light{background:var(--paper);color:var(--dark-text)}
+.white{background:#fff;color:var(--dark-text)}
+.dark{background:var(--ink)}
+.p-lg{font-size:clamp(1.1rem,1.7vw,1.45rem);line-height:1.55;max-width:58ch}
+.light .p-lg,.white .p-lg{color:#2b4b4f}
+.dark .p-lg{color:var(--muted)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s cubic-bezier(.2,.8,.2,1),transform 1s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* cursor */
+.cur{position:fixed;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;border:1.5px solid var(--cyan);border-radius:50%;pointer-events:none;z-index:200;transition:width .25s,height .25s,margin .25s,background .25s,opacity .25s;mix-blend-mode:difference;box-shadow:0 0 14px rgba(0,243,255,.6)}
+.cur::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:var(--cyan)}
+.cur.big{width:70px;height:70px;margin:-35px 0 0 -35px;background:rgba(0,243,255,.15)}
+.cur.hide{opacity:0}
+@media (hover:none),(pointer:coarse){.cur{display:none}}
+
+/* loader */
+.loader{position:fixed;inset:0;z-index:300;background:var(--ink);display:grid;place-items:center;transition:opacity .9s,visibility .9s}
+.loader.done{opacity:0;visibility:hidden}
+.loader .lw{position:relative;width:min(220px,50vw);aspect-ratio:1}
+.loader canvas{position:absolute;inset:-20%;width:140%;height:140%}
+.loader svg{position:absolute;inset:22%;color:#fff;opacity:0;animation:fi .8s .5s forwards}
+.loader p{position:absolute;bottom:-60px;left:0;right:0;text-align:center;font-family:var(--din);font-weight:700;font-size:.7rem;letter-spacing:.4em;color:var(--cyan);text-transform:uppercase}
+@keyframes fi{to{opacity:1}}
+
+/* nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:20px var(--pad);transition:background .4s,padding .4s,color .4s}
+.nav.solid{background:rgba(3,20,23,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding-top:12px;padding-bottom:12px;box-shadow:0 1px 0 var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:38px;height:38px;color:#fff;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.brand:hover svg{transform:rotate(-360deg)}
+.wm{font-family:var(--museo);font-weight:700;line-height:.9;font-size:1.25rem;letter-spacing:.01em}
+.wm b{font-weight:700;color:var(--cyan)}
+.wm small{display:block;text-align:right;font-size:.62em;color:#fff;letter-spacing:.02em}
+.links{display:flex;gap:28px;font-family:var(--din);font-weight:700;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase}
+.links a{color:var(--muted);position:relative;padding:6px 0;transition:color .3s}
+.links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1.5px;background:var(--cyan);transform:scaleX(0);transition:transform .35s}
+.links a:hover{color:#fff}.links a:hover::after{transform:scaleX(1)}
+.burger{display:none;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:none;color:#fff;position:relative}
+.burger span{position:absolute;left:13px;right:13px;height:1.5px;background:currentColor;transition:.3s}
+.burger span:first-child{top:18px}.burger span:last-child{top:26px}
+.menu-open .burger span:first-child{top:22px;transform:rotate(45deg)}
+.menu-open .burger span:last-child{top:22px;transform:rotate(-45deg)}
+@media (max-width:980px){
+  .links{position:fixed;inset:0;flex-direction:column;justify-content:center;align-items:center;gap:26px;font-size:1.3rem;background:rgba(3,20,23,.97);opacity:0;visibility:hidden;transition:.4s}
+  .menu-open .links{opacity:1;visibility:visible}
+  .burger{display:block;z-index:2}
+}
+
+/* HERO */
+.hero{position:relative;height:100svh;min-height:620px;overflow:hidden;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.hero-bg{position:absolute;inset:-5%;background:url(assets/img/tempestade.webp) center 40%/cover;will-change:transform;animation:kb 30s ease-in-out infinite alternate}
+@keyframes kb{from{scale:1}to{scale:1.08}}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 50% 42%,transparent 20%,rgba(3,20,23,.55) 70%),linear-gradient(180deg,rgba(3,20,23,.35),transparent 30%,transparent 60%,var(--ink))}
+.flash{position:absolute;inset:0;z-index:2;background:radial-gradient(circle at var(--fx,50%) 0%,rgba(200,255,255,.55),rgba(0,243,255,.12) 50%,transparent 75%);opacity:0;pointer-events:none}
+#bolts{position:absolute;inset:0;z-index:3;width:100%;height:100%;pointer-events:none}
+.emblem{position:relative;z-index:4;width:min(44vmin,420px);aspect-ratio:1;margin-top:-4vh}
+.emblem canvas{position:absolute;inset:-28%;width:156%;height:156%}
+.emblem .sym{position:absolute;inset:9%;width:82%;height:82%;color:#fff;filter:drop-shadow(0 0 18px rgba(0,243,255,.55))}
+.emblem .sym .circulo{opacity:0}
+.emblem .sym path{transition:transform .25s ease-out}
+.hero .wmbig{position:relative;z-index:4;font-family:var(--museo);font-weight:700;font-size:clamp(3rem,9vw,7.4rem);line-height:.85;letter-spacing:-.01em;margin-top:2vh;text-shadow:0 6px 40px rgba(0,0,0,.45)}
+.hero .wmbig small{display:block;text-align:right;font-size:.42em;letter-spacing:.01em;margin-top:.08em}
+.hero .wmbig .ch{display:inline-block;opacity:0;transform:translateY(40px) rotateX(60deg);transition:opacity .8s,transform .9s cubic-bezier(.2,.85,.2,1)}
+.ready .hero .wmbig .ch{opacity:1;transform:none}
+.hero .slogan{position:relative;z-index:4;margin-top:22px;max-width:92vw;padding:0 12px;font-family:var(--din);font-weight:300;font-size:clamp(1rem,1.7vw,1.35rem);letter-spacing:.06em;color:rgba(255,255,255,.88);opacity:0;transition:opacity 1.2s 1.2s}
+.ready .hero .slogan{opacity:1}
+.hero .slogan b{font-weight:700;color:var(--cyan)}
+.hint{position:absolute;white-space:nowrap;z-index:4;bottom:26px;left:50%;transform:translateX(-50%);font-family:var(--din);font-size:.62rem;font-weight:700;letter-spacing:.4em;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px}
+.hint i{width:1px;height:44px;background:linear-gradient(var(--cyan),transparent);animation:drip 2s infinite}
+.hint em{font-style:normal;color:var(--cyan)}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* CONCEITO */
+.conceito{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(40px,7vw,120px);align-items:end;max-width:1400px;margin:0 auto}
+.conceito .p-lg b{color:var(--teal);font-weight:700}
+.mantra{display:flex;flex-direction:column;gap:6px}
+.mantra span{font-family:var(--museo);font-weight:700;font-size:clamp(1.6rem,3.2vw,2.8rem);line-height:1.1;color:var(--teal)}
+.mantra span:nth-child(2){color:var(--green)}
+.mantra span:nth-child(3){color:var(--dark-text);background:linear-gradient(90deg,var(--teal),#00b8c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media (max-width:900px){.conceito{grid-template-columns:1fr}}
+
+/* NOME */
+.nome{height:240vh;padding:0}
+.nome .pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;padding:0 var(--pad)}
+.nome .rt{position:absolute;top:clamp(76px,11vh,120px);left:var(--pad);z-index:2}
+.word{position:relative;margin-top:14vh;font-family:var(--museo);font-weight:700;font-size:clamp(3.4rem,13.5vw,13rem);line-height:.9;letter-spacing:-.02em;display:flex;white-space:nowrap}
+.word .c{color:var(--teal);display:inline-block;will-change:transform}
+.word .m{color:var(--cyan);display:inline-block;will-change:transform;-webkit-text-stroke:0}
+.anno{position:absolute;font-family:var(--din);font-size:clamp(.9rem,1.35vw,1.15rem);color:#2b4b4f;max-width:24ch;line-height:1.35;opacity:0;transition:opacity .6s}
+.anno.on{opacity:1}
+.anno b{display:block;font-family:var(--museo);font-weight:700;font-size:1.4em;color:var(--teal)}
+.anno.a2 b{color:#00aab5}
+.anno::before{content:"";position:absolute;width:1.5px;background:var(--teal);left:50%;height:0;transition:height .7s .2s}
+.anno.on::before{height:clamp(30px,6vh,70px)}
+.anno.a1{text-align:center;transform:translate(-50%,-100%)}
+.anno.a1::before{top:calc(100% + 10px)}
+.anno.a2{text-align:center;transform:translate(-50%,0)}
+.anno.a2::before{bottom:calc(100% + 10px);background:#00aab5}
+@media (max-width:600px){.anno{width:20ch}.anno.a2{transform:translate(-75%,0);text-align:right}.anno.a2::before{left:75%}}
+.nome .ln{position:absolute;height:2px;background:var(--teal);transform-origin:left;transform:scaleX(0);transition:transform .8s}
+.nome .ln.on{transform:scaleX(1)}
+
+/* SIMBOLO */
+.simb{height:420vh;padding:0}
+.simb .pin{position:sticky;top:0;height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:4vw;padding:0 var(--pad);overflow:hidden}
+.simb .bgglow{position:absolute;right:-10vw;top:50%;width:70vw;height:70vw;transform:translateY(-50%);background:radial-gradient(circle,rgba(0,112,124,.35),transparent 60%);pointer-events:none}
+.steps{position:relative;min-height:340px}
+.step{position:absolute;inset:0;opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s;pointer-events:none}
+.step.on{opacity:1;transform:none;pointer-events:auto}
+.step .ico{font-family:var(--din);font-weight:700;font-size:.72rem;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase;display:flex;gap:10px;align-items:center}
+.step .ico i{width:24px;height:1.5px;background:var(--cyan)}
+.step h3{font-family:var(--museo);font-weight:700;font-size:clamp(2rem,4.4vw,3.8rem);line-height:1.02;margin:.35em 0 .4em}
+.step h3 em{font-style:normal;color:var(--cyan)}
+.step p{color:var(--muted);font-size:clamp(1rem,1.4vw,1.2rem);max-width:42ch}
+.dots{display:flex;gap:10px;margin-top:28px}
+.dots i{width:28px;height:3px;border-radius:3px;background:rgba(255,255,255,.18);transition:background .4s,width .4s}
+.dots i.on{background:var(--cyan);width:52px}
+.bigsym{position:relative;width:min(40vw,560px);aspect-ratio:1;justify-self:center}
+.bigsym canvas{position:absolute;inset:-26%;width:152%;height:152%;opacity:0;transition:opacity .8s}
+.bigsym.ring canvas{opacity:1}
+.bigsym svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.bigsym path{fill:#fff;transition:fill .6s,opacity .6s,filter .6s;transform-box:view-box}
+.bigsym .lab{position:absolute;font-family:var(--din);font-weight:700;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);opacity:0;transition:opacity .5s;white-space:nowrap}
+.bigsym .lab::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);margin-right:8px;box-shadow:0 0 10px var(--cyan)}
+.bigsym[data-s="1"] .lab.l1,.bigsym[data-s="2"] .lab.l2,.bigsym[data-s="3"] .lab.l3{opacity:1}
+.bigsym[data-s="1"] path:not(.chapeu),.bigsym[data-s="2"] path:not(.jtop):not(.jbot),.bigsym[data-s="3"] path:not(.circulo){opacity:.13}
+.bigsym[data-s="1"] .chapeu,.bigsym[data-s="2"] .jtop,.bigsym[data-s="2"] .jbot,.bigsym[data-s="3"] .circulo{fill:var(--cyan);filter:drop-shadow(0 0 16px rgba(0,243,255,.7))}
+@media (max-width:860px){
+  .simb .pin{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:center;gap:28px}
+  .bigsym{width:min(62vw,330px);order:-1}
+  .steps{min-height:250px}
+  .bigsym .lab{display:none}
+}
+
+/* FOCO */
+.foco{height:100vh;min-height:620px;padding:0;overflow:hidden;position:relative}
+.foco .layer{position:absolute;inset:0;background:url(assets/img/floresta-luz.webp) center/cover}
+.foco .blurred{filter:blur(7px) saturate(.5) brightness(.42);transform:scale(1.05)}
+.foco .sharp{filter:saturate(1.15) contrast(1.05);clip-path:inset(30% 30% 30% 30%)}
+.vf{position:absolute;pointer-events:none;z-index:3}
+.vf .cn{position:absolute;width:30px;height:30px;border:2px solid var(--cyan)}
+.vf .tl{left:-2px;top:-2px;border-right:0;border-bottom:0}.vf .tr{right:-2px;top:-2px;border-left:0;border-bottom:0}
+.vf .bl{left:-2px;bottom:-2px;border-right:0;border-top:0}.vf .br{right:-2px;bottom:-2px;border-left:0;border-top:0}
+.vf .hud{position:absolute;top:-30px;left:0;right:0;display:flex;justify-content:space-between;font-family:var(--din);font-weight:700;font-size:.7rem;letter-spacing:.18em;color:var(--cyan)}
+.vf .hud .rec::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b3b;margin-right:6px;animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+.vf .cross{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px}
+.vf .cross::before,.vf .cross::after{content:"";position:absolute;background:rgba(0,243,255,.8)}
+.vf .cross::before{left:12px;top:0;bottom:0;width:1.5px}.vf .cross::after{top:12px;left:0;right:0;height:1.5px}
+.foco .txt{position:absolute;z-index:4;left:var(--pad);bottom:clamp(40px,8vh,90px);max-width:520px;pointer-events:none}
+.foco .txt p{color:rgba(255,255,255,.82);font-size:clamp(1rem,1.3vw,1.15rem);text-shadow:0 2px 20px rgba(0,0,0,.6)}
+.eq{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.eq svg{height:56px;width:auto;color:#fff}
+.eq span{font-family:var(--museo);font-size:2.2rem;color:var(--cyan)}
+.foco .tip{position:absolute;z-index:4;right:var(--pad);top:clamp(90px,14vh,140px);font-family:var(--din);font-weight:700;font-size:.7rem;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase}
+
+/* ATUAÇÃO */
+.at-head{max-width:1400px;margin:0 auto 54px;display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap}
+.at-grid{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.at{position:relative;background:#fff;border-radius:22px;padding:28px 24px 30px;min-height:330px;display:flex;flex-direction:column;box-shadow:0 1px 0 rgba(0,112,124,.12),0 20px 50px -30px rgba(0,60,70,.35);overflow:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.at:hover{transform:translateY(-8px);box-shadow:0 30px 60px -28px rgba(0,60,70,.45)}
+.at .rw{position:relative;width:110px;height:110px;margin:-6px 0 auto -6px}
+.at .rw canvas{position:absolute;inset:-30%;width:160%;height:160%}
+.at .rw .n{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--museo);font-weight:700;font-size:1.5rem;color:var(--teal)}
+.at h3{font-family:var(--museo);font-weight:700;font-size:1.45rem;line-height:1.1;color:var(--teal);margin:24px 0 8px}
+.at p{font-size:.98rem;color:#3d5c60;line-height:1.5}
+.tools{max-width:1400px;margin:56px auto 0;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tools b{font-family:var(--din);font-weight:700;font-size:.74rem;letter-spacing:.3em;text-transform:uppercase;color:var(--teal);margin-right:12px}
+.tools span{font-family:var(--museo);font-weight:700;font-size:clamp(1rem,1.6vw,1.3rem);padding:12px 22px;border-radius:40px;border:1.5px solid rgba(0,112,124,.3);color:var(--teal);transition:all .3s}
+.tools span:hover{background:var(--teal);color:#fff;border-color:var(--teal)}
+@media (max-width:1150px){.at-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){.at-grid{grid-template-columns:1fr 1fr}.at{min-height:280px}}
+@media (max-width:460px){.at-grid{grid-template-columns:1fr}}
+
+/* PORTFOLIO */
+.pf-top{max-width:1400px;margin:0 auto 34px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters button{font-family:var(--din);font-weight:700;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;padding:12px 18px;border-radius:40px;border:1px solid var(--line);background:none;color:var(--muted);transition:.3s}
+.filters button:hover{color:#fff;border-color:var(--cyan)}
+.filters button.on{background:var(--cyan);color:var(--ink);border-color:var(--cyan)}
+.pf-grid{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pf{position:relative;aspect-ratio:202/158;border-radius:20px;overflow:hidden;isolation:isolate;padding:20px;display:flex;flex-direction:column;justify-content:space-between;border:1px solid var(--line);transition:transform .5s cubic-bezier(.2,.8,.2,1),border-color .4s}
+.pf.hide{display:none}
+.pf canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.pf:hover canvas,.pf:hover .cv{transform:scale(1.07)}
+.pf .cv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.pf::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,20,23,.15),transparent 35%,rgba(3,20,23,.92))}
+.pf:hover{border-color:var(--cyan)}
+.pf .cat{align-self:flex-start;font-weight:700;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;padding:7px 12px;border-radius:30px;background:rgba(3,20,23,.55);border:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.pf h3{font-family:var(--museo);font-weight:700;font-size:clamp(1.1rem,1.5vw,1.4rem);line-height:1.08}
+.pf .go{margin-top:10px;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan)}
+.pf .go i{font-style:normal;width:32px;height:32px;border-radius:50%;border:1px solid currentColor;display:grid;place-items:center;transition:.4s}
+.pf:hover .go i{background:var(--cyan);color:var(--ink);transform:rotate(-45deg)}
+.voices{max-width:1400px;margin:0 auto;display:none;border-radius:24px;padding:clamp(28px,4vw,56px);border:1px solid var(--line);background:linear-gradient(135deg,rgba(0,112,124,.35),rgba(17,86,45,.25))}
+.voices.show{display:grid;grid-template-columns:1fr 1.3fr;gap:40px;align-items:center}
+.voices h3{font-family:var(--museo);font-weight:700;font-size:clamp(1.8rem,3.4vw,2.8rem);line-height:1}
+.voices ul{list-style:none;display:flex;flex-wrap:wrap;gap:10px}
+.voices li{font-family:var(--museo);font-weight:700;padding:12px 18px;border-radius:40px;border:1px solid rgba(209,226,45,.45);color:var(--lime)}
+.wave{display:flex;gap:4px;align-items:center;height:56px;margin:20px 0}
+.wave i{width:5px;border-radius:4px;background:var(--cyan);animation:wv 1.1s ease-in-out infinite}
+@keyframes wv{0%,100%{height:12%}50%{height:100%}}
+.btn{display:inline-flex;align-items:center;gap:12px;font-family:var(--din);font-weight:700;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;padding:18px 30px;border-radius:60px;border:1.5px solid transparent;transition:background .3s,color .3s,box-shadow .3s,border-color .3s}
+.btn-c{background:var(--cyan);color:var(--ink)}
+.btn-c:hover{box-shadow:0 0 0 6px rgba(0,243,255,.18),0 0 40px rgba(0,243,255,.5)}
+.btn-o{border-color:rgba(255,255,255,.35);color:#fff}
+.btn-o:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn svg{width:18px;height:18px}
+.center{text-align:center}
+@media (max-width:1100px){.pf-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:760px){.pf-grid{grid-template-columns:1fr}.voices.show{grid-template-columns:1fr}}
+
+
+/* FUNDADOR */
+.fund{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(40px,7vw,110px);align-items:center;max-width:1300px;margin:0 auto}
+.ph{position:relative;perspective:1000px}
+.ph .fr{border-radius:50% 50% 24px 24px / 38% 38% 24px 24px;overflow:hidden;transition:transform .2s ease-out;box-shadow:0 40px 80px -30px rgba(0,60,70,.6)}
+.ph img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.ph .tagj{position:absolute;right:-14px;bottom:10%;background:var(--teal);color:#fff;border-radius:18px;padding:16px 20px;font-family:var(--museo);font-weight:700;line-height:1.1;box-shadow:0 20px 40px -20px rgba(0,60,70,.7)}
+.ph .tagj small{display:block;font-family:var(--din);font-weight:400;font-size:.75rem;opacity:.8;letter-spacing:.08em}
+.namemap{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.namemap div{flex:1 1 150px;border:1.5px solid rgba(0,112,124,.22);border-radius:18px;padding:16px 18px;background:#fff}
+.namemap svg{width:44px;height:44px;color:var(--teal)}
+.namemap svg path{opacity:.15}
+.namemap svg path.hl{opacity:1;fill:var(--teal)}
+.namemap b{display:block;font-family:var(--museo);font-weight:700;color:var(--teal);font-size:1.05rem;margin-top:8px}
+.namemap span{font-size:.85rem;color:#4c6b6f}
+@media (max-width:900px){.fund{grid-template-columns:1fr}.ph{max-width:420px;margin:0 auto}}
+
+/* CONTATO */
+.cta{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;overflow:hidden;padding:120px var(--pad)}
+.cta .bg{position:absolute;inset:0;background:url(assets/img/tempestade.webp) center 30%/cover;filter:brightness(.38) saturate(1.1)}
+.cta::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(var(--ink),transparent 30%,transparent 70%,var(--ink))}
+.cta>*:not(.bg){position:relative;z-index:2}
+.cta h2{font-family:var(--museo);font-weight:700;font-size:clamp(2.6rem,8vw,7rem);line-height:.95;letter-spacing:-.01em;margin:.2em 0 .5em}
+.cta h2 span{display:block}
+.cta h2 .mx{color:var(--cyan);text-shadow:0 0 40px rgba(0,243,255,.6)}
+.cta .row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.cta .tel{margin-top:22px;font-weight:700;letter-spacing:.14em;color:var(--muted);font-size:.9rem}
+
+/* FOOTER */
+.foot{background:#fff;color:var(--dark-text);padding:30px var(--pad)}
+.versions{display:grid;grid-template-columns:repeat(3,1fr);max-width:1000px;margin:0 auto 40px;border-radius:20px;overflow:hidden}
+.versions div{aspect-ratio:16/10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.versions svg{width:28%;height:auto}
+.versions .wm{font-size:clamp(.9rem,2vw,1.4rem)}
+.v1{background:#fff;color:var(--teal);box-shadow:inset 0 0 0 1.5px rgba(0,112,124,.15)}
+.v1 .wm b{color:var(--cyan)}.v1 .wm small{color:var(--teal)}
+.v2{background:#e7e9ea;color:#111}.v2 .wm b{color:#111}.v2 .wm small{color:#888}
+.v3{background:var(--teal);color:#fff}.v3 .wm b{color:#fff}
+.fl{max-width:1400px;margin:0 auto;align-items:center;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:.85rem;color:#4c6b6f}
+.fl a:hover{color:var(--teal)}
+.fbrand{display:flex;align-items:center;gap:10px;color:var(--teal)}.fbrand svg{width:34px;height:34px}.fbrand .wm{color:var(--teal);font-size:1.1rem}.fbrand .wm b{color:#00b8c4}.fbrand .wm small{color:var(--teal)}
+
+
+/* WhatsApp flutuante */
+.wa-fab{position:fixed;right:clamp(22px,4.5vw,72px);bottom:clamp(30px,7vh,72px);z-index:150;width:62px;height:62px;border-radius:50%;background:#25D366;color:#fff;display:grid;place-items:center;box-shadow:0 10px 30px -6px rgba(0,0,0,.55),0 0 0 0 rgba(37,211,102,.55);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s;animation:waPulse 2.6s infinite}
+.wa-fab svg{width:32px;height:32px}
+.wa-fab:hover{transform:scale(1.08)}
+.wa-fab .wa-tip{position:absolute;right:calc(100% + 12px);top:50%;transform:translate(8px,-50%);white-space:nowrap;background:#fff;color:#0b2e33;font-family:var(--din);font-weight:700;font-size:.82rem;padding:9px 14px;border-radius:12px;box-shadow:0 10px 24px -8px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.wa-fab:hover .wa-tip,.wa-fab:focus-visible .wa-tip{opacity:1;transform:translate(0,-50%)}
+.wa-fab:focus-visible{outline:3px solid var(--cyan);outline-offset:4px}
+@keyframes waPulse{0%{box-shadow:0 10px 30px -6px rgba(0,0,0,.55),0 0 0 0 rgba(37,211,102,.55)}70%{box-shadow:0 10px 30px -6px rgba(0,0,0,.55),0 0 0 16px rgba(37,211,102,0)}100%{box-shadow:0 10px 30px -6px rgba(0,0,0,.55),0 0 0 0 rgba(37,211,102,0)}}
+@media (max-width:600px){.wa-fab{width:56px;height:56px}.wa-fab svg{width:28px;height:28px}.wa-fab .wa-tip{display:none}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+  .hero .wmbig .ch{opacity:1;transform:none}.hero .slogan{opacity:1}
+}
+</style>
+</head>
+<body>
+
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="lw"><canvas class="ering" data-color="#00f3ff" data-r=".36"></canvas>
+  <svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg>
+  <p>Curtir o máximo</p></div>
+</div>
+<div class="cur" id="cur" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#inicio" aria-label="Curtamax arttech, início"><svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="circulo" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg><span class="wm">CURTA<b>MAX</b><small>arttech</small></span></a>
+  <nav class="links" id="links">
+    <a href="#conceito">Conceito</a><a href="#simbolo">Símbolo</a><a href="#atuacao">Atuação</a><a href="#portfolio">Portfólio</a><a href="blog/">Blog</a><a href="#contato">Contato</a>
+  </nav>
+  <button class="burger" id="burger" aria-label="Abrir menu"><span></span><span></span></button>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="flash" id="flash"></div>
+  <canvas id="bolts"></canvas>
+  <div class="emblem" id="emblem">
+    <canvas class="ering" data-color="#00f3ff" data-r=".34" data-boost="1"></canvas>
+    <svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="circulo" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg>
+  </div>
+  <h1 class="wmbig" aria-label="Curtamax arttech"><span data-split>CURTAMAX</span><small><span class="ch" style="transition-delay:.7s">arttech</span></small></h1>
+  <p class="slogan">Criatividade com <b>propósito</b>. Tecnologia com <b>alma</b>.</p>
+  <div class="hint"><span>TOQUE NO CÉU · INVOQUE UM <em>RAIO</em></span><i></i></div>
+</section>
+
+<!-- CONCEITO -->
+<section class="sec light" id="conceito">
+  <div class="conceito">
+    <div>
+      <span class="kick rv">01 · Conceito</span>
+      <h2 class="rt rv">Conceito</h2>
+      <p class="p-lg rv d1">A Curtamax é uma <b>ArtTech</b> que une <b>arte, design e tecnologia</b> para criar experiências criativas com propósito. Atuamos com mentorias, oficinas, palestras e produções visuais e sonoras, usando ferramentas digitais como IA, motion design, música, design criativo, sites e peças com alma.</p>
+    </div>
+    <div class="mantra">
+      <span class="rv d1">Criatividade em movimento.</span>
+      <span class="rv d2">Arte com intenção.</span>
+      <span class="rv d3">Curtir o Máximo da Experiência.</span>
+    </div>
+  </div>
+</section>
+
+<!-- NOME -->
+<section class="sec white nome" id="nome">
+  <div class="pin" id="nomePin">
+    <h2 class="rt" id="nomeTitle">O nome por trás da ideia</h2>
+    <div class="word" id="word"><span class="c" id="wC">CURTA</span><span class="m" id="wM">MAX</span></div>
+    <div class="anno a1" id="a1"><b>Curta</b>de curtir, aproveitar, sentir intensamente</div>
+    <div class="anno a2" id="a2"><b>Max</b>de máximo: tudo o que pode ser vivido sem limites, com intensidade</div>
+  </div>
+</section>
+
+<!-- SIMBOLO -->
+<section class="sec dark simb" id="simbolo">
+  <div class="pin">
+    <div class="bgglow"></div>
+    <div>
+      <span class="kick">02 · Significado do símbolo</span>
+      <div class="steps" id="steps">
+        <div class="step on" data-i="0"><div class="ico"><i></i>Dinamismo</div><h3>Há muito mais por trás das <em>formas</em></h3><p>À primeira vista, o símbolo chama atenção pelo movimento. Role para montar cada peça e descobrir o que ela significa.</p></div>
+        <div class="step" data-i="1"><div class="ico"><i></i>Peça 1 · Centro</div><h3>O <em>chapéu</em></h3><p>No centro, um chapéu estilizado: símbolo de personalidade, atitude e originalidade.</p></div>
+        <div class="step" data-i="2"><div class="ico"><i></i>Peça 2 · Ao redor</div><h3>Dois <em>J</em>s em movimento</h3><p>Dois traços curvos formam dois “J”s, de Johnatan de Jesus, nome do fundador Johnatan Conce. Eles envolvem o chapéu com fluidez, sugerindo movimento, equilíbrio e criatividade.</p></div>
+        <div class="step" data-i="3"><div class="ico"><i></i>Peça 3 · Contorno</div><h3>O <em>círculo</em></h3><p>O círculo externo representa o sobrenome Conceição e fecha a composição com a ideia de totalidade, união e pertencimento.</p></div>
+        <div class="step" data-i="4"><div class="ico"><i></i>Completo</div><h3>Uma marca <em>com alma</em></h3><p>Chapéu, movimento e união numa só forma, carregada de energia.</p></div>
+      </div>
+      <div class="dots" id="dots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="bigsym" id="bigsym" data-s="0">
+      <canvas class="ering" data-color="#00f3ff" data-r=".335"></canvas>
+      <svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="circulo" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg>
+      <span class="lab l1" style="left:62%;top:30%">Chapéu</span>
+      <span class="lab l2" style="left:-6%;top:22%">Johnatan de Jesus</span>
+      <span class="lab l3" style="left:70%;top:92%">Conceição</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOCO -->
+<section class="foco" id="foco" aria-label="Foco: uma visão além da estética">
+  <div class="layer blurred"></div>
+  <div class="layer sharp" id="sharp"></div>
+  <div class="vf" id="vf"><div class="hud"><span class="rec">REC</span><span id="tc">00:00:00:00</span></div><i class="cn tl"></i><i class="cn tr"></i><i class="cn bl"></i><i class="cn br"></i><div class="cross"></div></div>
+  <div class="tip">Mova para enquadrar</div>
+  <div class="txt">
+    <span class="kick">03 · Foco</span>
+    <h2 class="rt rv" style="color:#fff">Uma visão além da estética</h2>
+    <div class="eq rv d1">
+      <svg viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 30V8h22M90 8h22v22M112 50v22H90M30 72H8V50"/><circle cx="60" cy="40" r="9"/><path d="M42 40q18-16 36 0q-18 16-36 0z"/></svg>
+      <span>=</span>
+      <svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true" style="height:62px;width:62px;color:#fff"><path class="circulo" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg>
+    </div>
+    <p class="rv d2">Os elementos do símbolo lembram o gesto das mãos que formam um enquadramento, como o olhar de um diretor de cinema. É assim que olhamos para cada projeto.</p>
+  </div>
+</section>
+
+<!-- ATUAÇÃO -->
+<section class="sec light" id="atuacao">
+  <div class="at-head">
+    <div><span class="kick rv">04 · Atuação</span><h2 class="rt rv">O que fazemos</h2></div>
+    <p class="p-lg rv d1" style="max-width:40ch">Experiências criativas com propósito: da sala de aula ao palco, da imagem ao som.</p>
+  </div>
+  <div class="at-grid">
+    <article class="at rv"><div class="rw"><canvas class="ering" data-color="#00707c" data-r=".3"></canvas><span class="n">01</span></div><h3>Mentorias</h3><p>Acompanhamento próximo para destravar processos criativos e carreiras.</p></article>
+    <article class="at rv d1"><div class="rw"><canvas class="ering" data-color="#00c8d4" data-r=".3"></canvas><span class="n">02</span></div><h3>Oficinas</h3><p>Mão na massa com IA, motion, música e design criativo.</p></article>
+    <article class="at rv d2"><div class="rw"><canvas class="ering" data-color="#11562d" data-r=".3"></canvas><span class="n">03</span></div><h3>Palestras</h3><p>Arte, tecnologia e criatividade com propósito para inspirar equipes e públicos.</p></article>
+    <article class="at rv d3"><div class="rw"><canvas class="ering" data-color="#a9b81a" data-r=".3"></canvas><span class="n">04</span></div><h3>Produções visuais</h3><p>Motion design, artes com IA, VFX, sites e peças com alma.</p></article>
+    <article class="at rv d4"><div class="rw"><canvas class="ering" data-color="#00707c" data-r=".3"></canvas><span class="n">05</span></div><h3>Produções sonoras</h3><p>Música, trilhas, locução e dublagem para dar voz às ideias.</p></article>
+  </div>
+  <div class="tools rv"><b>Ferramentas</b><span>IA</span><span>Motion design</span><span>Música</span><span>Design criativo</span><span>Sites</span><span>Peças com alma</span></div>
+</section>
+
+<!-- PORTFÓLIO -->
+<section class="sec dark" id="portfolio">
+  <div class="pf-top">
+    <div><span class="kick rv">05 · Portfólio</span><h2 class="rt rv">Trabalhos</h2></div>
+    <div class="filters rv d1" id="filters">
+      <button class="on" data-f="all">Todos</button><button data-f="cases">Cases &amp; Ads</button><button data-f="motion">Motion &amp; IA</button><button data-f="voz">Vozes</button>
+    </div>
+  </div>
+  <div class="pf-grid" id="pfGrid"></div>
+  <div class="voices" id="voices">
+    <div><span class="kick">Voice actor · dublagem</span><h3>Vozes que dão vida</h3><div class="wave" id="wave" aria-hidden="true"></div>
+      <a class="btn btn-o" href="https://conce.myportfolio.com/voice" target="_blank" rel="noopener">Ouvir no portfólio ↗</a></div>
+    <ul><li>Buzz Lightyear</li><li>Homer Simpson</li><li>Scooby-Doo</li><li>As Branquelas</li><li>Pernalonga</li><li>Elle</li><li>Pateta</li><li>Frajola</li></ul>
+  </div>
+  <div class="center rv" style="margin-top:40px"><a class="btn btn-o" href="https://www.behance.net/johnatan-conce" target="_blank" rel="noopener">Ver tudo no Behance ↗</a></div>
+</section>
+
+<!-- FUNDADOR -->
+<section class="sec light" id="fundador">
+  <div class="fund">
+    <div class="ph rv"><div class="fr" id="pfr"><img src="assets/img/fundador.webp" alt="Retrato de Johnatan Conce, fundador da Curtamax" loading="lazy"></div>
+      <div class="tagj">Johnatan Conce<small>Fundador · diretor criativo</small></div></div>
+    <div>
+      <span class="kick rv">06 · Quem assina</span>
+      <h2 class="rt rv">Johnatan Conce</h2>
+      <p class="p-lg rv d1">Prazer, eu sou <b style="color:var(--teal)">Johnatan Conce</b>, fundador e diretor criativo da Curtamax. A marca carrega o meu nome: cada traço do símbolo é uma parte da minha história, e cada projeto é uma forma de transformar arte e tecnologia em experiências com intensidade.</p>
+      <div class="namemap">
+        <div class="rv d1"><svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="circulo" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop hl" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg><b>Johnatan</b><span>o primeiro J</span></div>
+        <div class="rv d2"><svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="circulo" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot hl" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg><b>de Jesus</b><span>o segundo J</span></div>
+        <div class="rv d3"><svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="circulo hl" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg><b>Conceição</b><span>o círculo que une</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section class="cta" id="contato">
+  <div class="bg"></div>
+  <span class="kick rv">07 · Contato</span>
+  <h2 class="rv d1"><span>Curtir o</span><span class="mx">máximo</span><span>da experiência</span></h2>
+  <div class="row rv d2">
+    <a class="btn btn-c" href="https://wa.me/5511998270485?text=Ol%C3%A1%2C%20Curtamax!%20Quero%20conversar%20sobre%20um%20projeto." target="_blank" rel="noopener" data-cur="1">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>
+      Conversar no WhatsApp</a>
+    <a class="btn btn-o" href="https://www.instagram.com/curtamax.ai/" target="_blank" rel="noopener" data-cur="1">@curtamax.ai ↗</a>
+  </div>
+  <span class="tel rv d3">WhatsApp · +55 11 99827-0485</span>
+</section>
+</main>
+
+<a class="wa-fab" href="https://wa.me/5511998270485?text=Ol%C3%A1%2C%20Curtamax!%20Quero%20conversar%20sobre%20um%20projeto." target="_blank" rel="noopener" aria-label="Conversar no WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg><span class="wa-tip">Fale com a gente</span></a>
+<footer class="foot">
+  <div class="fl"><span class="fbrand"><svg class="sym" viewBox="-12 -12 1024 1024" aria-hidden="true"><path class="circulo" fill-rule="evenodd" d="M485.0 0.0 L462.5 1.2 L435.6 3.9 L410.3 7.8 L385.8 12.8 L357.8 20.2 L334.9 27.6 L313.1 35.8 L289.8 45.9 L250.1 66.5 L226.8 80.9 L206.5 94.9 L168.8 125.2 L153.2 139.6 L133.0 160.2 L101.9 197.2 L87.5 217.0 L74.3 237.3 L60.3 261.4 L47.5 286.7 L31.1 325.6 L17.5 368.0 L11.3 393.6 L6.6 418.1 L2.7 447.3 L0.8 471.4 L0.0 495.5 L0.4 520.0 L1.9 544.5 L4.7 568.7 L8.6 592.8 L13.6 616.5 L20.2 641.4 L28.8 667.8 L46.3 710.6 L58.7 735.5 L70.4 756.1 L95.7 794.2 L113.2 816.8 L127.6 833.5 L162.2 868.5 L196.4 897.3 L213.9 910.2 L236.9 925.3 L260.2 938.9 L281.2 949.8 L306.1 961.1 L327.9 969.7 L372.6 983.7 L397.5 989.5 L420.8 993.8 L447.7 997.3 L472.2 999.2 L520.0 999.6 L565.9 995.7 L613.4 987.2 L640.2 980.2 L663.6 972.8 L708.3 954.9 L748.3 934.3 L771.3 920.3 L792.3 905.9 L811.7 891.1 L831.6 874.4 L847.5 859.6 L867.0 839.8 L896.9 804.4 L922.6 767.8 L944.8 729.3 L956.0 706.0 L966.9 679.9 L981.3 636.7 L992.2 589.7 L996.1 564.4 L998.8 537.1 L1000.0 515.0 L1000.0 485.0 L998.4 457.4 L995.7 432.5 L987.6 387.4 L977.8 351.2 L967.3 320.9 L957.2 296.4 L935.8 254.0 L910.5 213.9 L881.4 176.2 L864.6 157.5 L842.5 135.4 L823.8 118.6 L803.6 102.3 L767.4 77.0 L734.0 57.6 L703.6 42.8 L679.1 32.7 L632.8 17.5 L587.7 7.4 L558.1 3.1 L537.5 1.2 L515.4 0.0Z M473.4 20.2 L518.5 19.8 L564.4 23.7 L611.0 32.3 L638.7 39.7 L661.2 47.1 L701.3 63.4 L742.9 85.2 L764.7 98.8 L784.1 112.4 L819.1 140.8 L855.7 177.0 L882.9 209.6 L900.4 234.2 L911.3 251.3 L933.5 292.1 L951.4 334.5 L964.6 376.5 L974.3 422.4 L977.8 448.9 L979.8 473.4 L980.2 517.7 L976.3 564.0 L968.1 609.1 L960.7 637.1 L954.1 657.7 L944.0 684.2 L935.0 704.4 L914.4 743.3 L888.0 783.4 L860.4 817.6 L846.4 832.7 L826.1 852.6 L793.1 880.6 L769.0 898.1 L750.3 910.2 L710.6 931.9 L667.1 950.6 L641.8 959.2 L621.2 965.0 L576.0 974.3 L529.4 979.4 L510.3 980.2 L478.0 979.8 L437.6 976.3 L412.7 972.4 L388.6 967.3 L363.7 960.7 L340.7 953.3 L300.3 937.0 L259.0 915.6 L220.1 890.3 L184.0 861.5 L150.1 828.9 L131.5 807.9 L117.5 790.4 L101.5 768.2 L90.2 750.7 L77.4 728.5 L65.3 704.8 L48.6 664.7 L35.8 623.9 L29.9 599.4 L25.7 576.0 L20.6 529.8 L19.8 511.1 L20.2 477.2 L24.1 434.5 L27.6 412.3 L33.1 386.6 L45.9 342.7 L55.6 317.0 L63.8 298.3 L85.2 257.5 L110.1 219.4 L139.6 182.4 L153.2 167.6 L174.3 147.0 L207.3 119.0 L227.5 104.2 L248.9 90.2 L271.1 77.4 L295.6 65.0 L332.6 49.4 L373.8 36.2 L397.9 30.3 L425.1 25.3 L452.7 21.8Z"/><path class="jtop" fill-rule="evenodd" d="M226.0 233.8 L249.7 248.5 L279.7 264.9 L313.1 280.8 L351.2 296.8 L387.8 310.4 L430.2 324.8 L571.4 369.5 L624.7 389.7 L647.2 399.8 L674.1 413.8 L690.0 423.6 L709.1 437.2 L721.9 448.1 L735.1 461.3 L748.3 477.6 L760.0 496.3 L767.0 511.1 L772.5 525.9 L778.3 550.0 L781.4 578.4 L780.6 614.9 L777.5 641.0 L774.4 656.9 L804.0 610.3 L818.4 582.7 L826.1 565.1 L835.1 540.6 L840.5 520.4 L843.6 502.5 L844.8 488.5 L844.4 470.2 L842.5 456.2 L839.4 443.8 L834.3 430.2 L825.7 414.2 L816.8 401.8 L805.1 389.0 L790.0 375.7 L767.8 360.6 L734.0 343.1 L691.6 326.7 L645.3 313.1 L602.5 303.0 L542.2 291.3 L384.3 266.8 L315.8 255.2 L262.5 243.9Z"/><path class="jbot" fill-rule="evenodd" d="M225.2 343.4 L212.0 363.3 L195.3 391.3 L180.5 420.1 L168.0 450.4 L161.8 470.6 L158.3 486.2 L155.6 507.6 L155.6 527.0 L157.1 540.3 L161.0 556.6 L167.3 572.5 L173.9 584.6 L183.6 598.2 L200.3 615.7 L210.0 623.9 L236.1 641.4 L270.3 658.5 L300.3 670.2 L324.0 677.9 L354.3 686.5 L400.6 697.4 L459.4 708.7 L634.4 735.9 L687.7 745.2 L738.6 756.1 L774.4 766.2 L752.2 752.2 L727.7 738.6 L688.4 719.6 L649.6 703.2 L608.7 688.1 L565.9 673.7 L431.7 631.3 L378.8 611.4 L355.1 600.9 L331.4 588.9 L311.2 576.8 L290.9 562.4 L278.1 551.5 L265.3 538.7 L250.9 520.8 L242.7 508.0 L235.3 493.6 L226.8 470.6 L220.9 443.8 L218.6 415.4 L220.1 378.5Z"/><path class="chapeu" fill-rule="evenodd" d="M333.7 462.1 L326.7 480.4 L324.0 496.3 L324.8 509.9 L328.7 522.8 L332.9 530.9 L338.0 537.9 L350.1 550.0 L364.1 560.1 L386.6 572.2 L405.3 579.9 L426.7 587.3 L476.9 600.9 L536.4 613.4 L665.9 637.1 L693.9 643.3 L722.3 651.1 L697.4 638.3 L670.9 626.6 L635.2 613.0 L599.0 600.9 L625.4 490.5 L637.9 443.0 L631.7 437.2 L613.4 426.7 L593.2 418.1 L565.1 408.4 L539.9 401.0 L507.6 393.2 L484.6 389.0 L463.2 386.2 L443.4 385.8 L434.1 388.2 L432.1 387.8 L396.3 520.8 L391.3 516.9 L378.1 502.5 L370.7 491.2 L365.2 479.6 L361.3 466.4 L359.4 451.6 L359.4 437.6 L361.3 421.2 L347.7 438.7Z"/></svg><span class="wm">CURTA<b>MAX</b><small>arttech</small></span></span><span>© <span id="yr">2026</span> Curtamax arttech · Criatividade com propósito. Tecnologia com alma.</span><span><a href="https://www.instagram.com/curtamax.ai/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.behance.net/johnatan-conce" target="_blank" rel="noopener">Behance</a> · CNPJ 66.039.234/0001-50</span></div>
+</footer>
+
+<script>
+(function(){
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fine=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+$('#yr').textContent=new Date().getFullYear();
+const mouse={x:innerWidth/2,y:innerHeight/2,nx:0,ny:0};
+
+/* ---------- electric ring ---------- */
+const rings=[];
+function hexA(h,a){ const n=parseInt(h.slice(1),16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
+class ERing{
+  constructor(cv){ this.cv=cv; this.c=cv.getContext('2d'); this.col=cv.dataset.color||'#00f3ff'; this.rf=parseFloat(cv.dataset.r||'.34'); this.boost=+(cv.dataset.boost||0);
+    this.N=110; this.off=new Float32Array(this.N); this.tg=new Float32Array(this.N); this.br=[]; this.vis=false; this.f=0; this.energy=0; this.size(); }
+  size(){ const r=this.cv.getBoundingClientRect(), d=Math.min(devicePixelRatio||1,2); this.w=this.cv.width=Math.max(10,r.width*d); this.h=this.cv.height=Math.max(10,r.height*d); this.d=d; }
+  draw(){
+    const {c,w,h,N}=this; const R=Math.min(w,h)*this.rf, cx=w/2, cy=h/2;
+    this.f++; const e=this.energy; this.energy*=.94;
+    if(this.f%3===0){ for(let i=0;i<N;i++) this.tg[i]=(Math.random()-.5)*R*(.05+e*.12)*(Math.random()<.08?2.6:1);
+      if(Math.random()<.5+e){ this.br=[]; const nb=2+Math.floor(Math.random()*(3+e*6)); for(let k=0;k<nb;k++){ const a=Math.random()*6.283, pts=[], L=R*(.12+Math.random()*(.25+e*.3)); let rr=R; let aa=a; for(let s=0;s<6;s++){ pts.push([cx+Math.cos(aa)*rr, cy+Math.sin(aa)*rr]); rr+= L/6*(Math.random()<.2?-1:1); aa+=(Math.random()-.5)*.12; } this.br.push(pts);} } }
+    for(let i=0;i<N;i++) this.off[i]+= (this.tg[i]-this.off[i])*.5;
+    c.clearRect(0,0,w,h); c.globalCompositeOperation='lighter';
+    const path=(k)=>{ c.beginPath(); for(let i=0;i<=N;i++){ const j=i%N, a=j/N*6.283, r=R+this.off[j]*k; const x=cx+Math.cos(a)*r, y=cy+Math.sin(a)*r; i?c.lineTo(x,y):c.moveTo(x,y);} };
+    // halo
+    const g=c.createRadialGradient(cx,cy,R*.75,cx,cy,R*1.45); g.addColorStop(0,hexA(this.col,0)); g.addColorStop(.32,hexA(this.col,.22+e*.2)); g.addColorStop(1,hexA(this.col,0));
+    c.fillStyle=g; c.fillRect(0,0,w,h);
+    c.lineJoin='round';
+    path(1.6); c.strokeStyle=hexA(this.col,.18); c.lineWidth=R*.09; c.stroke();
+    path(1.2); c.strokeStyle=hexA(this.col,.5); c.lineWidth=R*.028+2*this.d; c.stroke();
+    path(1); c.strokeStyle='rgba(235,255,255,.95)'; c.lineWidth=1.3*this.d; c.stroke();
+    path(-.8); c.strokeStyle=hexA(this.col,.6); c.lineWidth=.9*this.d; c.stroke();
+    c.lineWidth=1.1*this.d; c.strokeStyle=hexA(this.col,.85);
+    for(const b of this.br){ c.beginPath(); b.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])); c.stroke(); }
+    c.globalCompositeOperation='source-over';
+  }
+}
+$$('canvas.ering').forEach(cv=>rings.push(new ERing(cv)));
+const rio=new IntersectionObserver(es=>es.forEach(e=>{ const r=rings.find(x=>x.cv===e.target); if(r){ r.vis=e.isIntersecting; if(r.vis) r.size(); } }),{rootMargin:'100px'});
+rings.forEach(r=>rio.observe(r.cv));
+addEventListener('resize',()=>rings.forEach(r=>r.size()));
+let last=0;
+(function loop(t){ if(t-last>38){ last=t; rings.forEach(r=>{ if(r.vis) r.draw(); }); } if(!RM) requestAnimationFrame(loop); })(0);
+if(RM) setTimeout(()=>rings.forEach(r=>{r.size(); r.draw();}),300);
+rings.forEach(r=>{ const host=r.cv.closest('.at'); if(host) host.addEventListener('pointerenter',()=>r.energy=1); });
+
+/* ---------- loader ---------- */
+function ready(){ $('#loader').classList.add('done'); document.body.classList.add('ready'); setTimeout(()=>strike(innerWidth/2,innerHeight*.42,true),700); }
+addEventListener('load',()=>setTimeout(ready,RM?0:1500)); setTimeout(ready,4500);
+
+/* split */
+$$('[data-split]').forEach(el=>{ const t=el.textContent; el.textContent=''; [...t].forEach((ch,i)=>{ const s=document.createElement('span'); s.className='ch'; s.textContent=ch; s.style.transitionDelay=(.06*i+.1)+'s'; if(i>=5) s.style.color='var(--cyan)'; el.appendChild(s); }); });
+
+/* nav */
+const nav=$('#nav');
+$('#burger').addEventListener('click',()=>document.body.classList.toggle('menu-open'));
+$$('#links a').forEach(a=>a.addEventListener('click',()=>document.body.classList.remove('menu-open')));
+
+/* cursor */
+const cur=$('#cur');
+addEventListener('pointermove',e=>{ mouse.x=e.clientX; mouse.y=e.clientY; mouse.nx=e.clientX/innerWidth*2-1; mouse.ny=e.clientY/innerHeight*2-1; cur.style.transform=`translate(${e.clientX}px,${e.clientY}px)`; });
+$$('a,button,.pf,.at').forEach(el=>{ el.addEventListener('pointerenter',()=>cur.classList.add('big')); el.addEventListener('pointerleave',()=>cur.classList.remove('big')); });
+
+/* ---------- lightning ---------- */
+const bc=$('#bolts'), bx=bc.getContext('2d'), hero=$('.hero'), flash=$('#flash'), emblem=$('#emblem');
+let bolts=[]; function bsize(){ const d=Math.min(devicePixelRatio||1,2); bc.width=hero.clientWidth*d; bc.height=hero.clientHeight*d; bc.d=d; } bsize(); addEventListener('resize',bsize);
+function segs(x1,y1,x2,y2,disp,out){ if(disp<4){ out.push([x1,y1,x2,y2]); return; } const mx=(x1+x2)/2+(Math.random()-.5)*disp, my=(y1+y2)/2+(Math.random()-.5)*disp; segs(x1,y1,mx,my,disp/2,out); segs(mx,my,x2,y2,disp/2,out); if(Math.random()<.12){ const a=Math.atan2(y2-y1,x2-x1)+(Math.random()-.5)*1.4; segs(mx,my,mx+Math.cos(a)*disp*1.2,my+Math.sin(a)*disp*1.2,disp/2.4,out);} }
+function strike(tx,ty,toRing){
+  if(RM) return; const d=bc.d, r=emblem.getBoundingClientRect(), hr=hero.getBoundingClientRect();
+  let x2=tx, y2=ty;
+  if(toRing){ const cx=r.left+r.width/2-hr.left, cy=r.top+r.height/2-hr.top, R=r.width*.5, a=-Math.PI/2+(Math.random()-.5)*1.6; x2=cx+Math.cos(a)*R; y2=cy+Math.sin(a)*R; }
+  const x1=x2+(Math.random()-.5)*hr.width*.5, s=[]; segs(x1*d,-10,x2*d,y2*d,Math.max(120,y2*.5)*d,s);
+  bolts.push({s,life:1});
+  flash.style.setProperty('--fx',(x2/hr.width*100)+'%'); flash.animate([{opacity:0},{opacity:1,offset:.08},{opacity:.2,offset:.2},{opacity:.8,offset:.28},{opacity:0}],{duration:700,easing:'ease-out'});
+  rings.forEach(rg=>{ if(rg.cv.closest('#emblem')) rg.energy=1; });
+  if(!bloop) bloop=requestAnimationFrame(bdraw);
+}
+let bloop=0;
+function bdraw(){ bx.clearRect(0,0,bc.width,bc.height); bx.globalCompositeOperation='lighter'; bx.lineCap='round';
+  bolts.forEach(b=>{ const a=b.life; [[14,.08],[6,.25],[2.2,.95]].forEach(([w,al],i)=>{ bx.strokeStyle= i==2?`rgba(235,255,255,${al*a})`:`rgba(0,243,255,${al*a})`; bx.lineWidth=w*bc.d; bx.beginPath(); b.s.forEach(([a1,b1,a2,b2])=>{ bx.moveTo(a1,b1); bx.lineTo(a2,b2); }); bx.stroke(); }); b.life-=.045; });
+  bolts=bolts.filter(b=>b.life>0); bx.globalCompositeOperation='source-over';
+  bloop= bolts.length? requestAnimationFrame(bdraw):0; if(!bolts.length) bx.clearRect(0,0,bc.width,bc.height); }
+hero.addEventListener('click',e=>{ const hr=hero.getBoundingClientRect(); strike(e.clientX-hr.left,e.clientY-hr.top,false); });
+setInterval(()=>{ if(scrollY<innerHeight*.8 && document.visibilityState==='visible' && Math.random()<.55) strike(0,0,true); },3800);
+
+/* emblem parallax parts */
+const heroSym=$('#emblem .sym'), parts={chapeu:22,jtop:12,jbot:-12,circulo:4};
+function heroParallax(){ if(!heroSym||RM) return; for(const k in parts){ const p=heroSym.querySelector('.'+k); if(p) p.style.transform=`translate(${mouse.nx*parts[k]}px,${mouse.ny*parts[k]}px)`; } }
+
+/* ---------- símbolo pinned ---------- */
+const simb=$('#simbolo'), big=$('#bigsym'), steps=$$('.step'), dots=$$('#dots i');
+const bigParts={chapeu:[0,-260,40],jtop:[300,-160,-30],jbot:[-300,180,30],circulo:[0,0,0]};
+function simbUpdate(){ const r=simb.getBoundingClientRect(); const p=Math.min(1,Math.max(0,-r.top/(simb.offsetHeight-innerHeight)));
+  const asm=Math.min(1,p/.18), e=1-(1-asm)**3;
+  for(const k in bigParts){ const el=big.querySelector('.'+k); if(!el) continue; const [dx,dy,rot]=bigParts[k];
+    if(k==='circulo'){ el.style.transformOrigin='500px 500px'; el.style.transform=`scale(${.4+.6*e}) rotate(${(1-e)*-120}deg)`; el.style.opacity= asm<1? e : ''; }
+    else { el.style.transformOrigin='500px 500px'; el.style.transform=`translate(${dx*(1-e)}px,${dy*(1-e)}px) rotate(${rot*(1-e)}deg)`; } }
+  const s= p<.2?0 : p<.4?1 : p<.6?2 : p<.8?3 : 4;
+  big.dataset.s=s; big.classList.toggle('ring',s===4);
+  steps.forEach((st,i)=>st.classList.toggle('on',i===s)); dots.forEach((d,i)=>d.classList.toggle('on',i===s));
+}
+
+/* ---------- nome pinned ---------- */
+const nome=$('#nome'), wC=$('#wC'), wM=$('#wM'), a1=$('#a1'), a2=$('#a2');
+function nomeUpdate(){ const r=nome.getBoundingClientRect(); const p=Math.min(1,Math.max(0,-r.top/(nome.offsetHeight-innerHeight)));
+  const sp=Math.min(1,Math.max(0,(p-.12)/.4)), e=1-(1-sp)**3; const gap=Math.min(innerWidth*.045,70)*e;
+  wC.style.transform=`translateX(${-gap}px)`; wM.style.transform=`translateX(${gap}px)`;
+  const pin=$('#nomePin').getBoundingClientRect(), cr=wC.getBoundingClientRect(), mr=wM.getBoundingClientRect();
+  a1.style.left=(cr.left+cr.width/2-pin.left)+'px'; a1.style.top=(cr.top-pin.top-Math.min(70,innerHeight*.06)-24)+'px';
+  a2.style.left=(mr.left+mr.width/2-pin.left)+'px'; a2.style.top=(mr.bottom-pin.top+Math.min(70,innerHeight*.06)+24)+'px';
+  a1.classList.toggle('on',p>.3); a2.classList.toggle('on',p>.45);
+}
+
+/* ---------- foco viewfinder ---------- */
+const foco=$('#foco'), sharp=$('#sharp'), vf=$('#vf'), tc=$('#tc');
+let fx=.5, fy=.45, ftx=.5, fty=.45, inFoco=false, frames=0;
+foco.addEventListener('pointermove',e=>{ const r=foco.getBoundingClientRect(); ftx=(e.clientX-r.left)/r.width; fty=(e.clientY-r.top)/r.height; inFoco=true; cur.classList.add('hide'); });
+foco.addEventListener('pointerleave',()=>{ inFoco=false; cur.classList.remove('hide'); });
+function focoUpdate(t){ const r=foco.getBoundingClientRect(); if(r.bottom<0||r.top>innerHeight) return;
+  if(!inFoco){ ftx=.55+Math.sin(t/2200)*.22; fty=.42+Math.cos(t/2900)*.14; }
+  fx+=(ftx-fx)*.12; fy+=(fty-fy)*.12;
+  const W=r.width, H=r.height, fw=Math.min(W*.42,560), fh=fw*9/16; let x=fx*W-fw/2, y=fy*H-fh/2; x=Math.max(10,Math.min(W-fw-10,x)); y=Math.max(40,Math.min(H-fh-10,y));
+  sharp.style.clipPath=`inset(${y}px ${W-x-fw}px ${H-y-fh}px ${x}px round 6px)`;
+  vf.style.left=x+'px'; vf.style.top=y+'px'; vf.style.width=fw+'px'; vf.style.height=fh+'px';
+  frames++; const f=frames%24, s=Math.floor(frames/24); tc.textContent=`00:${String(Math.floor(s/60)%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}:${String(f).padStart(2,'0')}`;
+}
+
+function sizeGal(){}
+/* ---------- main loop ---------- */
+const heroBg=$('#heroBg');
+function frame(t){
+  nav.classList.toggle('solid',scrollY>40);
+  if(!RM && scrollY<innerHeight*1.2){ heroBg.style.transform=`translate3d(${mouse.nx*-16}px,${scrollY*.35+mouse.ny*-10}px,0)`; heroParallax(); }
+  simbUpdate(); nomeUpdate(); focoUpdate(t||0);
+  if(!RM) requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+if(RM) addEventListener('scroll',()=>frame(0),{passive:true});
+
+/* reveal */
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.15});
+$$('.rv,.rt').forEach(el=>io.observe(el));
+
+/* portrait tilt */
+const pfr=$('#pfr'); if(fine&&!RM){ pfr.parentElement.addEventListener('pointermove',e=>{ const r=pfr.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; pfr.style.transform=`rotateY(${x*12}deg) rotateX(${-y*10}deg)`; }); pfr.parentElement.addEventListener('pointerleave',()=>pfr.style.transform=''); }
+
+/* ---------- portfolio ---------- */
+const P='https://www.behance.net/gallery/';
+const items=[
+ ['cases','Philips Áudio e Vídeo','257414243/Philips-Audio-e-Video','philips-audio-e-video',1],
+ ['motion','Brazil Soccer Comics','250779179/Brazil-Soccer-Comics','brazil-soccer-comics',1],
+ ['motion','AGON · Monalisa Gamer','220679677/AGON-Monalisa-Gamer','agon-monalisa-gamer',1],
+ ['motion','AnimalPunk','244371803/AnimalPunk','animalpunk',1],
+ ['motion','Robots AI','222979751/Robots-AI','robots-ai',1],
+ ['motion','AOC TV · Animes','200330637/AOC-TV-Animes','aoc-tv-animes',1],
+ ['motion','Reptile Business','255726763/Reptile-Business','reptile-business',1],
+ ['cases','Hiperbet 2025','241442073/Hiperbet-2025','hiperbet-2025',1],
+ ['cases','AOCTV · Isso é AOC','220740355/AOCTV-Isso-AOC','aoctv-isso-e-aoc',1],
+];
+const catName={cases:'Cases & Ads',motion:'Motion & IA'};
+const ringCol={cases:'0,243,255',motion:'209,226,45',branding:'0,190,200'};
+function rnd(s){ return ()=>{ s=(s*16807)%2147483647; return (s-1)/2147483646; }; }
+function cover(cv,cat,seed){ const w=cv.width=400,h=cv.height=500,c=cv.getContext('2d'),R=rnd(seed*7919+7),col=ringCol[cat];
+  const g=c.createLinearGradient(0,0,w,h); g.addColorStop(0,'#04242a'); g.addColorStop(.6,cat==='motion'?'#0b3a24':'#063a40'); g.addColorStop(1,'#031417'); c.fillStyle=g; c.fillRect(0,0,w,h);
+  for(let i=0;i<7;i++){ const x=R()*w,y=R()*h*.7,r=60+R()*140; const cg=c.createRadialGradient(x,y,0,x,y,r); cg.addColorStop(0,`rgba(${R()<.5?'0,112,124':'17,86,45'},.55)`); cg.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=cg; c.fillRect(0,0,w,h); }
+  const cx=w*(.3+R()*.4), cy=h*(.25+R()*.3), RR=70+R()*70; c.globalCompositeOperation='lighter';
+  const hg=c.createRadialGradient(cx,cy,RR*.6,cx,cy,RR*1.6); hg.addColorStop(0,`rgba(${col},0)`); hg.addColorStop(.35,`rgba(${col},.35)`); hg.addColorStop(1,`rgba(${col},0)`); c.fillStyle=hg; c.fillRect(0,0,w,h);
+  const a0=R()*6.283, span=3+R()*3.2;
+  [[8,.2],[3,.6],[1.2,1]].forEach(([lw,al],k)=>{ c.beginPath(); for(let i=0;i<=80;i++){ const a=a0+span*i/80, r=RR+(Math.sin(i*1.7+seed)*3+(R()-.5)*7); const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r; i?c.lineTo(x,y):c.moveTo(x,y);} c.strokeStyle=k==2?`rgba(235,255,255,${al})`:`rgba(${col},${al})`; c.lineWidth=lw; c.stroke(); });
+  c.strokeStyle=`rgba(${col},.8)`; c.lineWidth=1.2; for(let b=0;b<3;b++){ let x=cx+(R()-.5)*RR*2, y=0; c.beginPath(); c.moveTo(x,y); while(y<cy-RR*.4){ x+=(R()-.5)*26; y+=8+R()*14; c.lineTo(x,y);} c.stroke(); }
+  c.globalCompositeOperation='source-over';
+}
+const grid=$('#pfGrid');
+const vio=new IntersectionObserver(es=>es.forEach(e=>{ const v=e.target; if(e.isIntersecting && !RM){ const p=v.play(); if(p&&p.catch) p.catch(()=>{}); } else v.pause(); }),{threshold:.25});
+items.forEach((it,i)=>{ const [cat,t,path,img,hasV]=it; const a=document.createElement('a'); a.className='pf rv'; a.href=P+path; a.target='_blank'; a.rel='noopener'; a.dataset.cat=cat;
+  a.innerHTML=`<canvas aria-hidden="true"></canvas>${hasV?`<video class="cv" src="assets/pf/${img}.mp4" poster="assets/pf/${img}.webp" muted loop playsinline preload="none" aria-hidden="true"></video>`:''}<span class="cat">${catName[cat]}</span><div><h3>${t}</h3><div class="go">Ver no Behance<i>↗</i></div></div>`;
+  const vd=a.querySelector('video.cv'); if(vd){ vio.observe(vd); vd.addEventListener('error',()=>vd.remove()); }
+  cover(a.querySelector('canvas'),cat,i+1); grid.appendChild(a); io.observe(a);
+  a.addEventListener('pointerenter',()=>cur.classList.add('big')); a.addEventListener('pointerleave',()=>{cur.classList.remove('big'); a.style.transform='';});
+  if(fine&&!RM) a.addEventListener('pointermove',e=>{ const r=a.getBoundingClientRect(), x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; a.style.transform=`perspective(900px) rotateY(${x*8}deg) rotateX(${-y*8}deg)`; });
+});
+const wave=$('#wave'); for(let i=0;i<34;i++){ const b=document.createElement('i'); b.style.animationDelay=(-Math.random()*1.1)+'s'; b.style.animationDuration=(.7+Math.random()*.8)+'s'; wave.appendChild(b); }
+function applyFilter(f){ $$('#filters button').forEach(b=>b.classList.toggle('on',b.dataset.f===f)); let n=0;
+  grid.querySelectorAll('.pf').forEach(el=>{ const ok= f==='all' || el.dataset.cat===f; el.classList.toggle('hide',!ok); if(ok) el.classList.add('in'); });
+  grid.style.display= f==='voz'?'none':''; $('#voices').classList.toggle('show',f==='voz'); sizeGal(); }
+$('#filters').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) applyFilter(b.dataset.f); });
+applyFilter('all');
+})();
+</script>
+</body>
+</html>
