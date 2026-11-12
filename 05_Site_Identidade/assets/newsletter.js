@@ -3,7 +3,7 @@
    (Brevo › Contatos › Formulários › seu formulário › Compartilhar › "action" do HTML incorporado).
    Os nomes dos campos (FIELDS) precisam ser iguais aos do formulário na Brevo. */
 (function () {
-  var ACTION = "https://2a930cc9.sibforms.com/serve/MUIFAB-TopE_U96rrUSaGJN_wFbeG12VI8ZjJd2fAwI0czeRzFyqflIKnvwVwRQLNCwOcSeM4U8_lWBMhY4gDXWitNf-FB7NgT92rIQKTlNjpe9CTGYUP9LhIKyl92jlXFddR7JpPOZbJ82wC6fNxQ2k-tt1czrfoGqLLilVdMWSRYGhljPnbXFMV_PGg09hbTGw902TgdOcKpOLnw";   // ex.: "https://xxxxxxxx.sibforms.com/serve/MUIFA..."
+  var ACTION = "https://2a930cc9.sibforms.com/v2/serve/MUIFAB-TopE_U96rrUSaGJN_wFbeG12VI8ZjJd2fAwI0czeRzFyqflIKnvwVwRQLNCwOcSeM4U8_lWBMhY4gDXWitNf-FB7NgT92rIQKTlNjpe9CTGYUP9LhIKyl92jlXFddR7JpPOZbJ82wC6fNxQ2k-tt1czrfoGqLLilVdMWSRYGhljPnbXFMV_PGg09hbTGw902TgdOcKpOLnw==";   // ex.: "https://xxxxxxxx.sibforms.com/serve/MUIFA..."
   var DOUBLE_OPTIN = false; // mude para true quando ativar o "E-mail duplo de confirmação" na Brevo
   if (!DOUBLE_OPTIN) document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".nl-small[data-doi]").forEach(function (e) { e.hidden = true; });
