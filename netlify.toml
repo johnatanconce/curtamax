@@ -1,7 +1,0 @@
-# Netlify lê este arquivo a partir da Base directory (05_Site_Identidade).
-[build]
-  command = "python3 _blog/build_blog.py"
-  publish = "."
-
-[functions]
-  directory = "netlify/functions"
