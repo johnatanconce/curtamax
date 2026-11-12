@@ -1,0 +1,25 @@
+<section class="nl" id="newsletter" data-nl aria-labelledby="nl-t">
+  <div class="nl-in">
+    <div class="nl-sym" aria-hidden="true">{{SYM}}</div>
+    <div class="nl-tx">
+      <span class="nl-kick">Newsletter Curtamax</span>
+      <h2 id="nl-t">Um artigo por semana, <span>direto no seu e-mail</span></h2>
+      <p>Toda segunda: o artigo novo do blog e uma ideia prática de IA, motion e som para times de marketing. Sem spam. Você cancela quando quiser.</p>
+    </div>
+    <form class="nl-form" novalidate>
+      <div class="nl-row">
+        <label class="f"><span>Nome</span><input type="text" name="nome" autocomplete="given-name" placeholder="Como podemos te chamar"></label>
+        <label class="f"><span>E-mail</span><input type="email" name="email" autocomplete="email" placeholder="voce@empresa.com.br"></label>
+        <label class="f"><span>Empresa <i>(opcional)</i></span><input type="text" name="empresa" autocomplete="organization" placeholder="Onde você trabalha"></label>
+      </div>
+      <label class="nl-ok"><input type="checkbox" name="optin" value="1"><span>Quero receber a newsletter da Curtamax e li a <a href="{{UP}}privacidade/">Política de Privacidade</a>.</span></label>
+      <input type="text" name="hp" class="nl-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="nl-act">
+        <button class="nl-btn" type="submit"><span class="sp" aria-hidden="true"></span>Assinar a newsletter</button>
+        <span class="nl-small" data-doi>Você vai receber um e-mail para confirmar.</span>
+      </div>
+      <p class="nl-msg" role="status" aria-live="polite"></p>
+    </form>
+    <div class="nl-done" role="status"><span class="ic" aria-hidden="true">✓</span><div><b>Quase lá!</b><span class="txt"></span></div></div>
+  </div>
+</section>

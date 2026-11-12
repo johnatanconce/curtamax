@@ -179,3 +179,14 @@ a{color:inherit;text-decoration:none}
 .prose .disclaimer{background:#fff;border-left:4px solid var(--lime);border-radius:12px;padding:16px 20px;font-size:.98rem;color:#2b4b4f}
 .prose h3{font-family:var(--museo);font-weight:700;color:var(--dark-text);font-size:1.3rem;line-height:1.25;margin-top:1.8em}
 @media (max-width:700px){.tbl4 td,.tbl4 td:first-child,.tbl4 td:nth-child(3),.tbl4 td:nth-child(4){white-space:normal}.tbl th{letter-spacing:.06em;font-size:.68rem}.tbl{display:block;overflow-x:auto}}
+
+/* vinheta neon (recriação) */
+.neon-demo{margin:2.2em 0;text-align:center}
+.neon-demo .stage{position:relative;width:min(420px,80vw);aspect-ratio:1;margin:0 auto;border-radius:24px;background:radial-gradient(circle at 50% 50%,#062a30 0%,#031417 70%);box-shadow:0 30px 60px -36px rgba(0,60,70,.8);overflow:hidden}
+.neon-demo .ring{position:absolute;inset:8%;width:84%;height:84%;transform:rotate(-90deg);overflow:visible;filter:drop-shadow(0 0 3px #00f3ff) drop-shadow(0 0 10px #00f3ff) drop-shadow(0 0 22px #00707c)}
+.neon-demo .ring circle{fill:none;stroke:#e9ffff;stroke-width:3.2;stroke-linecap:round;stroke-dasharray:553;stroke-dashoffset:553;animation:neonRing 4s linear infinite}
+.neon-demo .sym{overflow:visible;position:absolute;left:24%;top:24%;width:52%;height:52%;color:#e9ffff;opacity:0;filter:drop-shadow(0 0 4px #00f3ff) drop-shadow(0 0 14px #00f3ff) drop-shadow(0 0 30px #00707c);animation:neonSym 4s linear infinite}
+.neon-demo figcaption{font-size:.85rem;color:#5d6f73;margin-top:10px}
+@keyframes neonRing{0%{stroke-dashoffset:553;opacity:1}22.5%{stroke-dashoffset:0}80%{stroke-dashoffset:0;opacity:1}95%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes neonSym{0%,22%{opacity:0}23%{opacity:1}23.6%{opacity:.15}24.2%{opacity:1}24.8%{opacity:.4}25.4%,30%{opacity:1}45%{opacity:.82}60%{opacity:1}80%{opacity:1}95%,100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.neon-demo .ring circle{stroke-dashoffset:0}.neon-demo .sym{opacity:1}}

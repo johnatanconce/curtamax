@@ -1,0 +1,51 @@
+/* Newsletter Curtamax · bloco de inscrição (site e blog) */
+.nl{--teal:#00707c;--cyan:#00f3ff;--lime:#d1e22d;--ink:#031417;--ink2:#06242a;
+  position:relative;overflow:hidden;background:var(--ink2);color:#fff;padding:clamp(64px,10vh,120px) clamp(20px,5vw,80px);
+  font-family:"DIN Next","Helvetica Neue",Arial,sans-serif;isolation:isolate}
+.nl::before{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(rgba(0,243,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,243,255,.05) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse at 20% 50%,#000 20%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at 20% 50%,#000 20%,transparent 75%)}
+.nl-in{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;grid-template-areas:"sym tx" "sym form";gap:22px 56px;align-items:center}
+.nl-sym{grid-area:sym;position:relative;width:clamp(150px,18vw,230px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  box-shadow:0 0 0 2px #dffeff,0 0 14px 2px var(--cyan),0 0 46px 6px rgba(0,243,255,.55),inset 0 0 22px rgba(0,243,255,.5);animation:nlHum 4s ease-in-out infinite}
+.nl-sym::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:2px solid transparent;border-top-color:rgba(0,243,255,.85);border-right-color:rgba(0,243,255,.25);filter:drop-shadow(0 0 6px var(--cyan));animation:nlSpin 5s linear infinite}
+.nl-sym svg{width:62%;height:62%;color:#fff;filter:drop-shadow(0 0 6px var(--cyan)) drop-shadow(0 0 18px rgba(0,243,255,.6))}
+.nl-sym svg .circulo{display:none}
+@keyframes nlSpin{to{transform:rotate(360deg)}}
+@keyframes nlHum{0%,100%{filter:brightness(1)}50%{filter:brightness(1.18)}}
+.nl-tx{grid-area:tx}
+.nl-kick{display:inline-block;font-weight:700;font-size:.74rem;letter-spacing:.32em;text-transform:uppercase;color:var(--ink);background:var(--lime);padding:6px 12px;border-radius:40px}
+.nl h2{font-family:"Museo","DIN Next",Georgia,serif;font-weight:700;font-size:clamp(1.9rem,4vw,3.1rem);line-height:1.06;margin:16px 0 12px;max-width:20ch}
+.nl h2 span{color:var(--cyan);text-shadow:0 0 28px rgba(0,243,255,.45)}
+.nl-tx p{color:rgba(255,255,255,.74);font-size:clamp(1rem,1.3vw,1.12rem);max-width:56ch;line-height:1.55}
+.nl-form{grid-area:form;display:grid;gap:12px;max-width:720px}
+.nl-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.nl-form label.f{display:flex;flex-direction:column;gap:6px;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.7)}
+.nl-form label.f i{font-style:normal;font-weight:400;letter-spacing:.04em;text-transform:none;color:rgba(255,255,255,.5)}
+.nl-form input[type=text],.nl-form input[type=email]{font:inherit;font-size:1rem;letter-spacing:0;text-transform:none;color:#fff;background:rgba(3,20,23,.7);border:1.5px solid rgba(0,243,255,.22);border-radius:14px;padding:14px 16px;outline:none;transition:border-color .25s,box-shadow .25s}
+.nl-form input::placeholder{color:rgba(255,255,255,.35)}
+.nl-form input:focus{border-color:var(--cyan);box-shadow:0 0 0 4px rgba(0,243,255,.14),0 0 18px rgba(0,243,255,.25)}
+.nl-form .bad input{border-color:#ff6b6b;box-shadow:0 0 0 4px rgba(255,107,107,.12)}
+.nl-ok{display:flex;gap:12px;align-items:flex-start;font-size:.92rem;color:rgba(255,255,255,.78);line-height:1.45;cursor:pointer}
+.nl-ok input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;margin-top:1px;border-radius:6px;border:1.5px solid rgba(0,243,255,.45);background:rgba(3,20,23,.7);display:grid;place-items:center;cursor:pointer;transition:.2s}
+.nl-ok input:checked{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 12px rgba(0,243,255,.6)}
+.nl-ok input:checked::after{content:"";width:6px;height:11px;border:solid var(--ink);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.nl-ok input:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+.nl-ok.bad input{border-color:#ff6b6b}
+.nl-ok a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
+.nl-act{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:4px}
+.nl-btn{font:inherit;font-weight:700;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);background:var(--cyan);border:0;border-radius:60px;padding:17px 30px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:box-shadow .3s,transform .2s}
+.nl-btn:hover{box-shadow:0 0 0 6px rgba(0,243,255,.18),0 0 40px rgba(0,243,255,.5)}
+.nl-btn:active{transform:scale(.97)}
+.nl-btn[disabled]{opacity:.6;cursor:wait}
+.nl-btn .sp{width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(3,20,23,.3);border-top-color:var(--ink);animation:nlSpin .8s linear infinite;display:none}
+.nl-btn[disabled] .sp{display:inline-block}
+.nl-small{font-size:.8rem;color:rgba(255,255,255,.5)}
+.nl-msg{font-size:.95rem;min-height:1.4em;margin:0}
+.nl-msg.err{color:#ff8c8c}
+.nl-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.nl-done{display:none;align-items:center;gap:16px;background:rgba(0,243,255,.08);border:1.5px solid rgba(0,243,255,.35);border-radius:18px;padding:18px 22px;max-width:720px;grid-area:form}
+.nl-done b{display:block;font-family:"Museo","DIN Next",Georgia,serif;font-size:1.3rem;color:var(--cyan)}
+.nl-done .txt{color:rgba(255,255,255,.8);font-size:.95rem}
+.nl-done .ic{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--cyan);color:var(--ink);box-shadow:0 0 22px rgba(0,243,255,.6);font-size:1.4rem;font-weight:700}
+.nl.sent .nl-form{display:none}.nl.sent .nl-done{display:flex}
+@media (max-width:900px){.nl-in{grid-template-columns:1fr;grid-template-areas:"sym" "tx" "form";gap:22px}.nl-sym{width:120px}.nl-row{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.nl-sym,.nl-sym::after,.nl-btn .sp{animation:none}}

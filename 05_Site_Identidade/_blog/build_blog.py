@@ -22,6 +22,8 @@ IG = "https://www.instagram.com/curtamax.ai/"
 
 SYM = (SRC / "sym.svg").read_text()
 WAFAB = (SRC / "wafab.html").read_text()
+NL = (SRC / "nl_section.html").read_text()
+PRIV = (SRC / "privacidade_body.html").read_text()
 WA_ICON = re.search(r"<svg.*?</svg>", WAFAB, re.S).group(0).replace(' aria-hidden="true"', "")
 
 
@@ -53,6 +55,8 @@ def head(title, desc, url, image, depth, kind="website"):
 <meta name="theme-color" content="#031417">
 <link rel="preload" href="{up}assets/fonts/Museo700-Regular.woff" as="font" type="font/woff" crossorigin>
 <link rel="stylesheet" href="{up}blog/blog.css">
+<link rel="stylesheet" href="{up}assets/newsletter.css">
+<script src="{up}assets/newsletter.js" defer></script>
 </head>
 <body>
 <header class="nav">
@@ -69,7 +73,7 @@ def foot():
     return f"""</main>
 {WAFAB}
 <footer class="foot">
-  <div class="fl"><span class="fbrand">{SYM}<span class="wm">CURTA<b>MAX</b><small>arttech</small></span></span><span>© <span id="yr">2026</span> Curtamax arttech · Criatividade com propósito. Tecnologia com alma.</span><span><a href="{IG}" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.linkedin.com/company/curtamax" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://www.behance.net/johnatan-conce" target="_blank" rel="noopener">Behance</a> · CNPJ 66.039.234/0001-50</span></div>
+  <div class="fl"><span class="fbrand">{SYM}<span class="wm">CURTA<b>MAX</b><small>arttech</small></span></span><span>© <span id="yr">2026</span> Curtamax arttech · Criatividade com propósito. Tecnologia com alma.</span><span><a href="{IG}" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.linkedin.com/company/curtamax" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://www.behance.net/johnatan-conce" target="_blank" rel="noopener">Behance</a> · <a href="/privacidade/">Privacidade</a> · CNPJ 66.039.234/0001-50</span></div>
 </footer>
 <script>document.getElementById('yr').textContent=new Date().getFullYear();
 var c=document.querySelector('[data-copy]');if(c)c.addEventListener('click',function(){{try{{navigator.clipboard.writeText(location.href);c.textContent='Link copiado';}}catch(e){{}}}});</script>
@@ -90,6 +94,10 @@ def cta(up, msg):
   </div>
 </section>
 """
+
+
+def newsletter(up):
+    return NL.replace("{{UP}}", up).replace("{{SYM}}", SYM) + "\n"
 
 
 def today_br():
@@ -143,7 +151,7 @@ def build():
 </section>
 </article>
 """
-        page += cta("../../", msg) + foot()
+        page += newsletter("../../") + cta("../../", msg) + foot()
         page = page.replace("{{SYM}}", SYM)
         d = OUT / m["slug"]
         d.mkdir(exist_ok=True)
@@ -168,11 +176,18 @@ def build():
 <section class="list"><div class="grid">{cards}
 </div></section>
 """
-    page += cta("../", "Ol%C3%A1%2C%20Curtamax!%20Vim%20pelo%20blog%20e%20quero%20conversar%20sobre%20um%20projeto.") + foot()
+    page += newsletter("../") + cta("../", "Ol%C3%A1%2C%20Curtamax!%20Vim%20pelo%20blog%20e%20quero%20conversar%20sobre%20um%20projeto.") + foot()
     (OUT / "index.html").write_text(page)
 
+    # política de privacidade
+    pdir = ROOT / "privacidade"; pdir.mkdir(exist_ok=True)
+    pdesc = "Como a Curtamax cuida dos dados de quem assina a newsletter ou entra em contato, de acordo com a LGPD."
+    page = head("Política de Privacidade · Curtamax arttech", pdesc, f"{SITE}/privacidade/", f"{SITE}/assets/img/tempestade.webp", 1)
+    page += PRIV + foot()
+    (pdir / "index.html").write_text(page)
+
     # sitemap
-    urls = [f"{SITE}/", f"{SITE}/blog/"] + [f"{SITE}/blog/{m['slug']}/" for m in posts]
+    urls = [f"{SITE}/", f"{SITE}/blog/", f"{SITE}/privacidade/"] + [f"{SITE}/blog/{m['slug']}/" for m in posts]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sm += "".join(f"  <url><loc>{u}</loc></url>\n" for u in urls) + "</urlset>\n"
     (ROOT / "sitemap.xml").write_text(sm)
